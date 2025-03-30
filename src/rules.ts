@@ -30,7 +30,16 @@ export class GameState {
     return Object.freeze(initialState)
   }
 
-  private neighbors = (row: number, column: number) => {
+  get enemyTurn(): Player {
+    switch (this.turn) {
+      case 'black':
+        return 'white'
+      default:
+        return 'black'
+    }
+  }
+
+  private neighborsAt = (row: number, column: number) => {
     const neighbors: (readonly [number, number])[] = []
     const neighborhood = [
       [-1, 0],
@@ -46,5 +55,59 @@ export class GameState {
       neighbors.push([nextRow, nextColumn])
     }
     return neighbors
+  }
+
+  pieceAt = (row: number, column: number) => {
+    const piece = this.pieces.find(({ row: pieceRow, column: pieceColumn }) => {
+      return pieceRow === row && pieceColumn === column
+    })
+    if (piece === undefined) {
+      return null
+    }
+    return piece
+  }
+
+  movesAt = (row: number, column: number) => {
+    const neighbors = this.neighborsAt(row, column)
+    const piece = this.pieceAt(row, column)
+    if (piece === null || piece.color !== this.turn) {
+      return []
+    }
+    return neighbors.filter(([neighborRow, neighborColumn]) => {
+      const enemyPiece = this.pieceAt(neighborRow, neighborColumn)
+      return enemyPiece !== null && enemyPiece.color === this.enemyTurn
+    })
+  }
+
+  move = (
+    fromRow: number,
+    fromColumn: number,
+    toRow: number,
+    toColumn: number,
+  ) => {
+    const moves = this.movesAt(fromRow, fromColumn)
+    const isPossible = moves.some(([row, column]) => {
+      return row === toRow && column === toColumn
+    })
+    if (!isPossible) {
+      return null
+    }
+    const nextPieces = this.pieces.filter(({ row, column }) => {
+      const notFrom = row !== fromRow || column !== fromColumn
+      const notTo = row !== toRow || column !== toColumn
+      return notFrom && notTo
+    })
+    nextPieces.push({
+      row: toRow,
+      column: toColumn,
+      color: this.turn,
+    })
+    const nextState = new GameState(
+      this.rows,
+      this.columns,
+      this.enemyTurn,
+      nextPieces,
+    )
+    return Object.freeze(nextState)
   }
 }
