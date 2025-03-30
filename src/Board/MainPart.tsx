@@ -1,18 +1,40 @@
 import type { FC } from 'react'
-import { BoardPosition, MainPartProps } from './types'
+import { Position, MainPartProps } from './types'
 
-const generatePositions = (rows: number, columns: number) => {
-  const output: BoardPosition[] = []
-  for (let row = 0; row < rows; row++) {
-    for (let column = 0; column < columns; column++) {
-      output.push({ row, column })
+const MainPart: FC<MainPartProps> = ({
+  rows,
+  columns,
+  pieces,
+  highlight,
+  onCellClick,
+}) => {
+  const generatePositions = () => {
+    const output: Position[] = []
+    for (let row = 0; row < rows; row++) {
+      for (let column = 0; column < columns; column++) {
+        output.push({ row, column })
+      }
     }
+    return output
   }
-  return output
-}
 
-const MainPart: FC<MainPartProps> = ({ rows, columns, state, highlight }) => {
-  const positions = generatePositions(rows, columns)
+  const getPieceColorAt = (row: number, column: number) => {
+    const piece = pieces.find(
+      piece => piece.row === row && piece.column === column,
+    )
+    if (piece === undefined) {
+      return null
+    }
+    return piece.color
+  }
+
+  const isHighlightedAt = (row: number, column: number) => {
+    return highlight.some(marker => {
+      return marker.row === row && marker.column === column
+    })
+  }
+
+  const positions = generatePositions()
 
   return (
     <div
@@ -22,13 +44,51 @@ const MainPart: FC<MainPartProps> = ({ rows, columns, state, highlight }) => {
         gridTemplateColumns: `repeat(${columns}, 1fr)`,
       }}
     >
-      {positions.map(({ row, column }, index) =>
-        index % 2 === 0 ? (
-          <div className="bg-white" />
-        ) : (
-          <div className="bg-gray-500" />
-        ),
-      )}
+      {positions.map(({ row, column }, index) => {
+        const pieceColor = getPieceColorAt(row, column)
+        const pieceElement = (() => {
+          switch (pieceColor) {
+            case 'white':
+              return (
+                <div className="rounded-[100%] bg-orange-700 border-8 border-orange-500 w-full h-full" />
+              )
+            case 'black':
+              return (
+                <div className="rounded-[100%] bg-cyan-700 border-8 border-cyan-500 w-full h-full" />
+              )
+            default:
+              return <></>
+          }
+        })()
+        const isHighlighted = isHighlightedAt(row, column)
+        const content = (() => {
+          switch (true) {
+            case isHighlighted && index % 2 === 0:
+              return (
+                <div className="bg-pink-200 p-1 w-full h-full">
+                  {pieceElement}
+                </div>
+              )
+            case isHighlighted && index % 2 !== 0:
+              return (
+                <div className="bg-pink-700 p-1 w-full h-full">
+                  {pieceElement}
+                </div>
+              )
+            case index % 2 === 0:
+              return (
+                <div className="bg-white p-1 w-full h-full">{pieceElement}</div>
+              )
+            default:
+              return (
+                <div className="bg-gray-500 p-1 w-full h-full">
+                  {pieceElement}
+                </div>
+              )
+          }
+        })()
+        return <div onClick={() => onCellClick(row, column)}>{content}</div>
+      })}
     </div>
   )
 }

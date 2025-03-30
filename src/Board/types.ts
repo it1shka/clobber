@@ -1,26 +1,21 @@
-export type BoardPosition = {
+export type Position = {
   row: number
   column: number
 }
 
-export type BoardState = Array<
-  {
-    occupiedBy: 'black' | 'white'
-  } & BoardPosition
->
+export type Piece = {
+  color: 'black' | 'white'
+} & Position
 
-export type BoardHighlight = Array<
-  {
-    color?: string
-  } & BoardPosition
->
+export type CellClickHandler = (row: number, column: number) => void
 
 export type BoardProps = Partial<{
   rows: number
   columns: number
-  state: BoardState
-  highlight: BoardHighlight
+  pieces: Piece[]
+  highlight: Position[]
   borderWidth: number
+  onCellClick: CellClickHandler
 }>
 
 export type HAxisProps = {
@@ -36,6 +31,7 @@ export type VAxisProps = {
 export type MainPartProps = {
   rows: number
   columns: number
-  state: BoardState
-  highlight: BoardHighlight
+  pieces: Piece[]
+  highlight: Position[]
+  onCellClick: CellClickHandler
 }

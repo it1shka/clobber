@@ -7,9 +7,10 @@ import MainPart from './MainPart'
 const Board: FC<BoardProps> = ({
   rows = 6,
   columns = 5,
-  state = [],
+  pieces = [],
   highlight = [],
   borderWidth = 28,
+  onCellClick = () => {},
 }) => {
   return (
     <div className="h-full w-full bg-white flex flex-col">
@@ -19,8 +20,9 @@ const Board: FC<BoardProps> = ({
         <MainPart
           rows={rows}
           columns={columns}
-          state={state}
+          pieces={pieces}
           highlight={highlight}
+          onCellClick={onCellClick}
         />
         <VerticalAxis rows={rows} borderWidth={borderWidth} />
       </div>
