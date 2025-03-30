@@ -50,11 +50,11 @@ const MainPart: FC<MainPartProps> = ({
           switch (pieceColor) {
             case 'white':
               return (
-                <div className="rounded-[100%] bg-orange-700 border-8 border-orange-500 w-full h-full" />
+                <div className="cursor-pointer rounded-[100%] bg-orange-700 border-8 border-orange-500 w-full h-full" />
               )
             case 'black':
               return (
-                <div className="rounded-[100%] bg-cyan-700 border-8 border-cyan-500 w-full h-full" />
+                <div className="cursor-pointer rounded-[100%] bg-cyan-700 border-8 border-cyan-500 w-full h-full" />
               )
             default:
               return <></>

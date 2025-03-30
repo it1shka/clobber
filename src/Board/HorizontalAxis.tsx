@@ -9,19 +9,19 @@ const HorizontalAxis: FC<HAxisProps> = ({ columns, borderWidth }) => {
   return (
     <div className="w-full flex flex-row" style={{ height: borderWidth }}>
       <div
-        className="bg-gray-500 border-gray-700 border-2"
+        className="bg-gray-700 border-gray-700 border-4"
         style={{ width: borderWidth, height: borderWidth }}
       ></div>
       {axis.map((mark, index) => (
         <p
-          className="flex-1 text-center bg-gray-500 text-amber-200 border-gray-700 border-2"
+          className="flex-1 text-center bg-gray-500 text-amber-200 border-gray-700 border-2 border-t-4 border-b-4"
           key={index}
         >
           {mark}
         </p>
       ))}
       <div
-        className="bg-gray-500 border-gray-700 border-2"
+        className="bg-gray-700 border-gray-700 border-4"
         style={{ width: borderWidth, height: borderWidth }}
       ></div>
     </div>
