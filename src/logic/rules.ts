@@ -82,10 +82,14 @@ export class GameState {
   get possibleMoves() {
     return this.pieces
       .filter(({ color }) => color === this.turn)
-      .reduce(
-        (acc, { row, column }) => [...acc, ...this.movesAt(row, column)],
-        new Array<readonly [number, number]>(),
-      )
+      .reduce((acc, { row, column }) => {
+        const localMoves = this.movesAt(row, column).map(
+          ([moveRow, moveColumn]) => {
+            return [row, column, moveRow, moveColumn] as const
+          },
+        )
+        return [...acc, ...localMoves]
+      }, new Array<readonly [number, number, number, number]>())
   }
 
   move = (

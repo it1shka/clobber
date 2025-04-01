@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { GameState } from '../logic/rules'
+import { GameState } from './logic/rules'
 
 const DEFAULT_ROWS = 6
 const DEFAULT_COLUMNS = 5
