@@ -87,7 +87,14 @@ const MainPart: FC<MainPartProps> = ({
               )
           }
         })()
-        return <div onClick={() => onCellClick(row, column)}>{content}</div>
+        return (
+          <div
+            key={`${row}:${column}`}
+            onClick={() => onCellClick(row, column)}
+          >
+            {content}
+          </div>
+        )
       })}
     </div>
   )
