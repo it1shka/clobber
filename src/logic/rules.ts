@@ -30,6 +30,56 @@ export class GameState {
     return Object.freeze(initialState)
   }
 
+  get identifier() {
+    const pieceIdentifier = this.pieces
+      .map(({ row, column, color }) => {
+        const position = row * this.columns + column
+        return { position, color } as const
+      })
+      .sort(({ position: a }, { position: b }) => a - b)
+      .map(({ position, color }) => {
+        return `${position}${color.charAt(0)}`
+      })
+      .join('')
+    const headerIndentifier = `r${this.rows}c${this.columns}t${this.turn.charAt(0)}`
+    return `${headerIndentifier}:${pieceIdentifier}`
+  }
+
+  static fromIdentifier = (identifier: string) => {
+    const mainParts = identifier.split(':')
+    if (mainParts.length !== 2) {
+      return null
+    }
+    let [headerRaw, piecesRaw] = mainParts
+    const headerPattern = /^r(\d+)c(\d+)t(b|w)$/
+    const headerParsed = headerPattern.exec(headerRaw)
+    if (headerParsed === null) {
+      return null
+    }
+    const [_, rowsRaw, columnsRaw, turnRaw] = headerParsed
+    const rows = Number(rowsRaw)
+    const columns = Number(columnsRaw)
+    const turn = turnRaw === 'b' ? 'black' : 'white'
+    const pieces: Piece[] = []
+    const piecePattern = /^(\d+)(b|w)/
+    let pieceMatch: RegExpExecArray | null = null
+    while ((pieceMatch = piecePattern.exec(piecesRaw))) {
+      const [whole, positionRaw, colorRaw] = pieceMatch
+      const position = Number(positionRaw)
+      const row = ~~(position / columns)
+      const column = position % columns
+      const color = colorRaw === 'b' ? 'black' : 'white'
+      pieces.push({
+        row,
+        column,
+        color,
+      })
+      piecesRaw = piecesRaw.slice(whole.length)
+    }
+    const state = new GameState(rows, columns, turn, pieces)
+    return Object.freeze(state)
+  }
+
   get enemyTurn(): Player {
     switch (this.turn) {
       case 'black':
@@ -92,12 +142,18 @@ export class GameState {
       }, new Array<readonly [number, number, number, number]>())
   }
 
+  get possibleOutcomes(): Array<Readonly<GameState>> {
+    return this.possibleMoves
+      .map(move => this.move(...move))
+      .filter((move): move is Readonly<GameState> => move !== null)
+  }
+
   move = (
     fromRow: number,
     fromColumn: number,
     toRow: number,
     toColumn: number,
-  ) => {
+  ): Readonly<GameState> | null => {
     const moves = this.movesAt(fromRow, fromColumn)
     const isPossible = moves.some(([row, column]) => {
       return row === toRow && column === toColumn

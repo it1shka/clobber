@@ -11,12 +11,15 @@ const Board: FC<BoardProps> = ({
   highlight = [],
   borderWidth = 28,
   onCellClick = () => {},
+  showBorder = true,
 }) => {
   return (
     <div className="h-full w-full bg-white flex flex-col">
-      <HorizontalAxis columns={columns} borderWidth={borderWidth} />
+      {showBorder && (
+        <HorizontalAxis columns={columns} borderWidth={borderWidth} />
+      )}
       <div className="flex-1 flex flex-row">
-        <VerticalAxis rows={rows} borderWidth={borderWidth} />
+        {showBorder && <VerticalAxis rows={rows} borderWidth={borderWidth} />}
         <MainPart
           rows={rows}
           columns={columns}
@@ -24,9 +27,11 @@ const Board: FC<BoardProps> = ({
           highlight={highlight}
           onCellClick={onCellClick}
         />
-        <VerticalAxis rows={rows} borderWidth={borderWidth} />
+        {showBorder && <VerticalAxis rows={rows} borderWidth={borderWidth} />}
       </div>
-      <HorizontalAxis columns={columns} borderWidth={borderWidth} />
+      {showBorder && (
+        <HorizontalAxis columns={columns} borderWidth={borderWidth} />
+      )}
     </div>
   )
 }

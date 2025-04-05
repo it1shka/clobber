@@ -16,6 +16,7 @@ export type BoardProps = Partial<{
   highlight: Position[]
   borderWidth: number
   onCellClick: CellClickHandler
+  showBorder: boolean
 }>
 
 export type HAxisProps = {

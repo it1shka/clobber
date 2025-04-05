@@ -1,12 +1,32 @@
 import '@xyflow/react/dist/style.css'
-import { Background, Controls, ReactFlow } from '@xyflow/react'
-import useGameState from '../useGameState'
+import { useEffect } from 'react'
+import {
+  Background,
+  Controls,
+  Edge,
+  ReactFlow,
+  useEdgesState,
+  useNodesState,
+} from '@xyflow/react'
 import useTreePaneState from './state'
+import TreeNode from './TreeNode'
+import { GameStateNode, useEdges, useNodes } from './graphHooks'
 
 const GameTreePane = () => {
   const { show, close } = useTreePaneState()
 
-  const { state } = useGameState()
+  const [nodes, setNodes, onNodesChange] = useNodesState<GameStateNode>([])
+  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([])
+
+  const graphNodes = useNodes()
+  useEffect(() => {
+    setNodes(graphNodes)
+  }, [graphNodes])
+
+  const graphEdges = useEdges()
+  useEffect(() => {
+    setEdges(graphEdges)
+  }, [graphEdges])
 
   return (
     <div
@@ -23,11 +43,17 @@ const GameTreePane = () => {
       </button>
 
       <ReactFlow
-        edges={[]}
-        snapGrid={[20, 20]}
+        nodesConnectable={false}
+        nodes={nodes}
+        edges={edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
         fitView
         proOptions={{
           hideAttribution: true,
+        }}
+        nodeTypes={{
+          customTreeNode: TreeNode,
         }}
       >
         <Background />
