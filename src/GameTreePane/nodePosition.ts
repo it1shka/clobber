@@ -1,4 +1,4 @@
-import type {GameStateNode} from "./graphHooks";
+import type { GameStateNode } from './graphHooks'
 
 const RADIUS = 1200
 
@@ -10,9 +10,9 @@ export const mergeNodes = (prev: GameStateNode[], next: GameStateNode[]) => {
     }
 
     const parent = prev.find(({ data }) => {
-      return data
-        .possibleOutcomes
-        .some(outcome => outcome.identifier === nextNode.id)
+      return data.possibleOutcomes.some(
+        outcome => outcome.identifier === nextNode.id,
+      )
     })
 
     if (parent === undefined) {
@@ -28,16 +28,18 @@ export const mergeNodes = (prev: GameStateNode[], next: GameStateNode[]) => {
     })!
     const angle = 2 * Math.PI * (index / parentOutcomes.length)
 
-    const { position: { x, y } } = parent
+    const {
+      position: { x, y },
+    } = parent
     const deltaX = Math.cos(angle) * RADIUS
     const deltaY = Math.sin(angle) * RADIUS
-    
+
     return {
       ...nextNode,
       position: {
         x: x + deltaX,
         y: y + deltaY,
-      }
+      },
     }
   })
 }

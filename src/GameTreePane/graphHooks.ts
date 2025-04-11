@@ -11,10 +11,9 @@ export const useNodes = (): GameStateNode[] => {
 
   const identifiers = expandedNodes
     .map(nodeId => {
-      return GameState
-        .fromIdentifier(nodeId)!
-        .possibleOutcomes
-        .map(outcome => outcome.identifier)
+      return GameState.fromIdentifier(nodeId)!.possibleOutcomes.map(
+        outcome => outcome.identifier,
+      )
     })
     .reduce((acc, elem) => [...acc, ...elem], [state.identifier])
 
@@ -37,16 +36,14 @@ export const useEdges = (): Edge[] => {
   return expandedNodes
     .map(sourceId => {
       const sourceState = GameState.fromIdentifier(sourceId)!
-      return sourceState
-        .possibleOutcomes
-        .map(outcome => {
-          const targetId = outcome.identifier
-          return {
-            id: `${sourceId}-${targetId}`,
-            source: sourceId,
-            target: targetId,
-          }
-        })
+      return sourceState.possibleOutcomes.map(outcome => {
+        const targetId = outcome.identifier
+        return {
+          id: `${sourceId}-${targetId}`,
+          source: sourceId,
+          target: targetId,
+        }
+      })
     })
     .reduce((acc, elem) => [...acc, ...elem], [])
 }
