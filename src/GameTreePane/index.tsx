@@ -11,6 +11,7 @@ import {
 import useTreePaneState from './state'
 import TreeNode from './TreeNode'
 import { GameStateNode, useEdges, useNodes } from './graphHooks'
+import { mergeNodes } from './nodePosition'
 
 const GameTreePane = () => {
   const { show, close } = useTreePaneState()
@@ -20,7 +21,7 @@ const GameTreePane = () => {
 
   const graphNodes = useNodes()
   useEffect(() => {
-    setNodes(graphNodes)
+    setNodes(prev => mergeNodes(prev, graphNodes))
   }, [graphNodes])
 
   const graphEdges = useEdges()
@@ -42,23 +43,25 @@ const GameTreePane = () => {
         Close
       </button>
 
-      <ReactFlow
-        nodesConnectable={false}
-        nodes={nodes}
-        edges={edges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        fitView
-        proOptions={{
-          hideAttribution: true,
-        }}
-        nodeTypes={{
-          customTreeNode: TreeNode,
-        }}
-      >
-        <Background />
-        <Controls />
-      </ReactFlow>
+      {show && (
+        <ReactFlow
+          nodesConnectable={false}
+          nodes={nodes}
+          edges={edges}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          fitView
+          proOptions={{
+            hideAttribution: true,
+          }}
+          nodeTypes={{
+            customTreeNode: TreeNode,
+          }}
+        >
+          <Background />
+          <Controls />
+        </ReactFlow>
+      )}
     </div>
   )
 }

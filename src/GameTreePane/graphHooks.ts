@@ -1,4 +1,3 @@
-import {useEffect, useRef} from 'react'
 import type { Node, Edge } from '@xyflow/react'
 import { GameState } from '../logic/rules'
 import useGameState from '../useGameState'
@@ -8,42 +7,46 @@ export type GameStateNode = Node<Readonly<GameState>>
 
 export const useNodes = (): GameStateNode[] => {
   const { state } = useGameState()
-  const expandedNodesIds = useTreePaneState(
-    ({ expandedNodes }) => expandedNodes,
-  )
-  const childrenNodes = expandedNodesIds
-    .map(nodeId => GameState.fromIdentifier(nodeId)?.possibleOutcomes)
-    .filter((state): state is Array<Readonly<GameState>> => state !== null)
-    .reduce((acc, elem) => [...acc, ...elem], [])
-  const nodes = [state, ...childrenNodes]
-  const flowNodes = nodes.map(node => {
+  const { expandedNodes } = useTreePaneState()
+
+  const identifiers = expandedNodes
+    .map(nodeId => {
+      return GameState
+        .fromIdentifier(nodeId)!
+        .possibleOutcomes
+        .map(outcome => outcome.identifier)
+    })
+    .reduce((acc, elem) => [...acc, ...elem], [state.identifier])
+
+  const uniqueIdentifiers = Array.from(new Set(identifiers))
+
+  const flowNodes = uniqueIdentifiers.map(nodeId => {
     return {
-      id: node.identifier,
+      id: nodeId,
       type: 'customTreeNode',
-      data: node,
+      data: GameState.fromIdentifier(nodeId)!,
       position: { x: 0, y: 0 },
     }
   })
+
   return flowNodes
 }
 
 export const useEdges = (): Edge[] => {
-  const expandedNodesIds = useTreePaneState(
-    ({ expandedNodes }) => expandedNodes,
-  )
-  return expandedNodesIds
-    .map(sourceId => GameState.fromIdentifier(sourceId))
-    .filter((sourceState): sourceState is Readonly<GameState> => sourceState !== null)
-    .map(sourceState => {
-      const sourceId = sourceState.identifier
+  const { expandedNodes } = useTreePaneState()
+  return expandedNodes
+    .map(sourceId => {
+      const sourceState = GameState.fromIdentifier(sourceId)!
       return sourceState
         .possibleOutcomes
-        .map(outcome => outcome.identifier)
-        .map(targetId => ({
-          id: `${sourceId}-${targetId}`,
-          source: sourceId,
-          target: targetId,
-        }))
+        .map(outcome => {
+          const targetId = outcome.identifier
+          return {
+            id: `${sourceId}-${targetId}`,
+            source: sourceId,
+            target: targetId,
+          }
+        })
     })
     .reduce((acc, elem) => [...acc, ...elem], [])
 }
