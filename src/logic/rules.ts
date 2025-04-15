@@ -89,7 +89,7 @@ export class GameState {
     }
   }
 
-  private neighborsAt = (row: number, column: number) => {
+  neighborsAt = (row: number, column: number) => {
     const neighbors: (readonly [number, number])[] = []
     const neighborhood = [
       [-1, 0],

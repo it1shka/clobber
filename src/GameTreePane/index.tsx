@@ -45,12 +45,15 @@ const GameTreePane = () => {
 
       {show && (
         <ReactFlow
+          fitView
+          fitViewOptions={{
+            maxZoom: 0.85,
+          }}
           nodesConnectable={false}
           nodes={nodes}
           edges={edges}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
-          fitView
           proOptions={{
             hideAttribution: true,
           }}
