@@ -10,6 +10,7 @@ export type TreePaneState = {
   open: () => void
   close: () => void
   toggleNode: (id: NodeID) => void
+  reset: () => void
 }
 
 const useTreePaneState = create<TreePaneState>(set => ({
@@ -34,6 +35,12 @@ const useTreePaneState = create<TreePaneState>(set => ({
       expandedNodes: prev.expandedNodes.includes(id)
         ? prev.expandedNodes.filter(nodeId => nodeId !== id)
         : [...prev.expandedNodes, id],
+    })),
+
+  reset: () =>
+    set(prev => ({
+      ...prev,
+      expandedNodes: [],
     })),
 }))
 

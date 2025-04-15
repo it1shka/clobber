@@ -1,3 +1,4 @@
+import { cached } from '../lib'
 import { minimax, minimaxABP, type MinimaxProps } from './minimax'
 import type { GameState } from './rules'
 
@@ -45,6 +46,8 @@ export const evaluateGameState = ({
   })()
   return algorithm(minimaxProps)
 }
+
+export const cachedEval = cached(evaluateGameState)
 
 const evaluatePiecesAmount =
   (perspective: GameState['turn']) => (state: GameState) => {

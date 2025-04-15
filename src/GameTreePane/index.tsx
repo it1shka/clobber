@@ -1,33 +1,8 @@
-import '@xyflow/react/dist/style.css'
-import { useEffect } from 'react'
-import {
-  Background,
-  Controls,
-  Edge,
-  ReactFlow,
-  useEdgesState,
-  useNodesState,
-} from '@xyflow/react'
 import useTreePaneState from './state'
-import TreeNode from './TreeNode'
-import { GameStateNode, useEdges, useNodes } from './graphHooks'
-import { mergeNodes } from './nodePosition'
+import Graph from './Graph'
 
 const GameTreePane = () => {
   const { show, close } = useTreePaneState()
-
-  const [nodes, setNodes, onNodesChange] = useNodesState<GameStateNode>([])
-  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([])
-
-  const graphNodes = useNodes()
-  useEffect(() => {
-    setNodes(prev => mergeNodes(prev, graphNodes))
-  }, [graphNodes])
-
-  const graphEdges = useEdges()
-  useEffect(() => {
-    setEdges(graphEdges)
-  }, [graphEdges])
 
   return (
     <div
@@ -43,28 +18,7 @@ const GameTreePane = () => {
         Close
       </button>
 
-      {show && (
-        <ReactFlow
-          fitView
-          fitViewOptions={{
-            maxZoom: 0.85,
-          }}
-          nodesConnectable={false}
-          nodes={nodes}
-          edges={edges}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          proOptions={{
-            hideAttribution: true,
-          }}
-          nodeTypes={{
-            customTreeNode: TreeNode,
-          }}
-        >
-          <Background />
-          <Controls />
-        </ReactFlow>
-      )}
+      {show && <Graph />}
     </div>
   )
 }

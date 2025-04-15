@@ -2,8 +2,17 @@ import type { Node, Edge } from '@xyflow/react'
 import { GameState } from '../logic/rules'
 import useGameState from '../useGameState'
 import useTreePaneState from './state'
+import { useEffect } from 'react'
 
 export type GameStateNode = Node<Readonly<GameState>>
+
+export const useReset = () => {
+  const { state } = useGameState()
+  const { reset } = useTreePaneState()
+  useEffect(() => {
+    reset()
+  }, [state, reset])
+}
 
 export const useNodes = (): GameStateNode[] => {
   const { state } = useGameState()

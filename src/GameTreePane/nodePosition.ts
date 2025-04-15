@@ -1,6 +1,11 @@
 import type { GameStateNode } from './graphHooks'
 
-const RADIUS = 1200
+const MIN_RADIUS = 400
+const RADIUS_DELTA = 25
+
+const calcDistance = (n: number) => {
+  return MIN_RADIUS + RADIUS_DELTA * n
+}
 
 export const mergeNodes = (prev: GameStateNode[], next: GameStateNode[]) => {
   return next.map(nextNode => {
@@ -31,8 +36,9 @@ export const mergeNodes = (prev: GameStateNode[], next: GameStateNode[]) => {
     const {
       position: { x, y },
     } = parent
-    const deltaX = Math.cos(angle) * RADIUS
-    const deltaY = Math.sin(angle) * RADIUS
+    const radius = calcDistance(parentOutcomes.length)
+    const deltaX = Math.cos(angle) * radius
+    const deltaY = Math.sin(angle) * radius
 
     return {
       ...nextNode,
