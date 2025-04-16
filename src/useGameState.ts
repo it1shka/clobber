@@ -5,7 +5,11 @@ const DEFAULT_ROWS = 6
 const DEFAULT_COLUMNS = 5
 
 type GameStateStore = {
-  state: Readonly<GameState>
+  memory: Readonly<GameState>[]
+  pointer: number
+
+  getUnderPointer: () => Readonly<GameState>
+  getActiveHistory: () => Readonly<GameState>[]
 
   restart: () => void
   resizeAndRestart: (rows: number, columns: number) => void
@@ -15,31 +19,101 @@ type GameStateStore = {
     toRow: number,
     toColumn: number,
   ) => void
+  back: () => void
+  forth: () => void
 }
 
-const useGameState = create<GameStateStore>(set => ({
-  state: GameState.initial(DEFAULT_ROWS, DEFAULT_COLUMNS),
+export const useGameState = create<GameStateStore>((set, get) => {
+  const initialState = GameState.initial(DEFAULT_ROWS, DEFAULT_COLUMNS)
 
-  restart: () =>
-    set(prev => ({
-      ...prev,
-      state: GameState.initial(prev.state.rows, prev.state.columns),
-    })),
+  return {
+    memory: [initialState],
+    pointer: 0,
 
-  resizeAndRestart: (rows, columns) =>
-    set(prev => ({
-      ...prev,
-      state: GameState.initial(rows, columns),
-    })),
+    getUnderPointer: () => get().memory[get().pointer],
+    getActiveHistory: () => get().memory.slice(0, get().pointer + 1),
 
-  move: (fromRow, fromColumn, toRow, toColumn) =>
-    set(prev => {
-      const nextState = prev.state.move(fromRow, fromColumn, toRow, toColumn)
-      return {
-        ...prev,
-        state: nextState ?? prev.state,
-      }
-    }),
-}))
+    restart: () => {
+      set(prev => {
+        const { rows, columns } = prev.getUnderPointer()
+        const newInitialState = GameState.initial(rows, columns)
+        return {
+          ...prev,
+          memory: [newInitialState],
+          pointer: 0,
+        }
+      })
+    },
 
-export default useGameState
+    resizeAndRestart: (rows, columns) => {
+      const newInitialState = GameState.initial(rows, columns)
+      set(prev => {
+        return {
+          ...prev,
+          memory: [newInitialState],
+          pointer: 0,
+        }
+      })
+    },
+
+    move: (fromRow, fromColumn, toRow, toColumn) => {
+      set(prev => {
+        const prevState = prev.getUnderPointer()
+        const nextState = prevState.move(fromRow, fromColumn, toRow, toColumn)
+        if (nextState === null) {
+          return prev
+        }
+        const activeHistory = prev.getActiveHistory()
+        return {
+          ...prev,
+          memory: [...activeHistory, nextState],
+          pointer: prev.pointer + 1,
+        }
+      })
+    },
+
+    back: () => {
+      set(prev => {
+        if (prev.pointer <= 0) {
+          return prev
+        }
+        return {
+          ...prev,
+          pointer: prev.pointer - 1,
+        }
+      })
+    },
+
+    forth: () => {
+      set(prev => {
+        if (prev.pointer >= prev.memory.length - 1) {
+          return prev
+        }
+        return {
+          ...prev,
+          pointer: prev.pointer + 1,
+        }
+      })
+    },
+  }
+})
+
+export const useGameStateComputedAttrs = () => {
+  const state = useGameState(({ memory, pointer }) => {
+    return memory[pointer]
+  })
+
+  const canRollback = useGameState(({ pointer }) => {
+    return pointer > 0
+  })
+
+  const canForward = useGameState(({ memory, pointer }) => {
+    return pointer < memory.length - 1
+  })
+
+  return {
+    state,
+    canRollback,
+    canForward,
+  } as const
+}

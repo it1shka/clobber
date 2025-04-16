@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
 import Board from './Board'
-import useGameState from './useGameState'
+import { useGameState, useGameStateComputedAttrs } from './useGameState'
 
 const BoardPane = () => {
-  const { state, move } = useGameState()
+  const { move } = useGameState()
+  const { state } = useGameStateComputedAttrs()
   const [start, setStart] = useState<readonly [number, number] | null>(null)
 
   useEffect(() => {
