@@ -6,16 +6,19 @@ type NodeID = GameState['identifier']
 export type TreePaneState = {
   show: boolean
   expandedNodes: NodeID[]
+  pivotNode: NodeID | null
 
   open: () => void
   close: () => void
   toggleNode: (id: NodeID) => void
   reset: () => void
+  setPivot: (newPivot: NodeID | null) => void
 }
 
 const useTreePaneState = create<TreePaneState>(set => ({
   show: false,
   expandedNodes: [],
+  pivotNode: null,
 
   open: () =>
     set(prev => ({
@@ -41,7 +44,15 @@ const useTreePaneState = create<TreePaneState>(set => ({
     set(prev => ({
       ...prev,
       expandedNodes: [],
+      pivotNode: null,
     })),
+
+  setPivot: newPivot => {
+    set(prev => ({
+      ...prev,
+      pivotNode: newPivot,
+    }))
+  },
 }))
 
 export default useTreePaneState
