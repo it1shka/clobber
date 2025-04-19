@@ -2,9 +2,11 @@ import { useEffect, useState } from 'react'
 import Board from './Board'
 import { useGameState, useGameStateComputedAttrs } from './useGameState'
 
+const DIFF_COLOR = '#e2cd1a'
+
 const BoardPane = () => {
   const { move } = useGameState()
-  const { state } = useGameStateComputedAttrs()
+  const { state, stateDiff } = useGameStateComputedAttrs()
   const [start, setStart] = useState<readonly [number, number] | null>(null)
 
   useEffect(() => {
@@ -15,12 +17,29 @@ const BoardPane = () => {
     }
   }, [])
 
-  const highlight = start
+  const possibilitiesHighlight = start
     ? [...state.movesAt(...start), start].map(([row, column]) => ({
         row,
         column,
       }))
     : []
+
+  const differenceHighlight = stateDiff
+    .filter(([row, column]) => {
+      return !possibilitiesHighlight.some(
+        ({ row: pRow, column: pColumn }) => row === pRow && column === pColumn,
+      )
+    })
+    .map(
+      ([row, column]) =>
+        ({
+          row,
+          column,
+          color: DIFF_COLOR,
+        }) as const,
+    )
+
+  const highlight = [...possibilitiesHighlight, ...differenceHighlight]
 
   const handleCellClick = (row: number, column: number) => {
     if (start === null) {
