@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { GameState } from './logic/rules'
+import { getStateDiff } from './logic/lib'
 
 const DEFAULT_ROWS = 6
 const DEFAULT_COLUMNS = 5
@@ -111,9 +112,20 @@ export const useGameStateComputedAttrs = () => {
     return pointer < memory.length - 1
   })
 
+  const previousState = useGameState(({ memory, pointer }) => {
+    if (pointer <= 0) {
+      return null
+    }
+    return memory[pointer - 1]
+  })
+
+  const stateDiff =
+    previousState !== null ? getStateDiff(previousState, state) : []
+
   return {
     state,
     canRollback,
     canForward,
+    stateDiff,
   } as const
 }

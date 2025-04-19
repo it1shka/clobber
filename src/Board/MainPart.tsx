@@ -34,6 +34,12 @@ const MainPart: FC<MainPartProps> = ({
     })
   }
 
+  const getHighlightColor = (row: number, column: number) => {
+    return highlight.find(({ row: hRow, column: hColumn }) => {
+      return hRow === row && hColumn === column
+    })?.color
+  }
+
   const positions = generatePositions()
 
   return (
@@ -61,8 +67,18 @@ const MainPart: FC<MainPartProps> = ({
           }
         })()
         const isHighlighted = isHighlightedAt(row, column)
+        const highlightColor = getHighlightColor(row, column)
         const content = (() => {
           switch (true) {
+            case isHighlighted && highlightColor !== undefined:
+              return (
+                <div
+                  className="p-1 w-full h-full"
+                  style={{ backgroundColor: highlightColor }}
+                >
+                  {pieceElement}
+                </div>
+              )
             case isHighlighted && index % 2 === 0:
               return (
                 <div className="bg-pink-200 p-1 w-full h-full">

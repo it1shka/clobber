@@ -1,7 +1,14 @@
+import type { CSSProperties } from 'react'
+
 export type Position = {
   row: number
   column: number
 }
+
+export type Highlight = Partial<{
+  color: CSSProperties['color']
+}> &
+  Position
 
 export type Piece = {
   color: 'black' | 'white'
@@ -33,6 +40,6 @@ export type MainPartProps = {
   rows: number
   columns: number
   pieces: Piece[]
-  highlight: Position[]
+  highlight: Highlight[]
   onCellClick: CellClickHandler
 }
