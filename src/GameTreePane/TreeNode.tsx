@@ -49,6 +49,8 @@ const TreeNode = ({ data: gameState, isConnectable }: TreeNodeProps) => {
           }}
         >
           <Board
+            rows={gameState.rows}
+            columns={gameState.columns}
             pieces={gameState.pieces}
             highlight={differenceHighlight}
             showBorder={false}

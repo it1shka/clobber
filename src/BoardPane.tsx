@@ -73,6 +73,8 @@ const BoardPane = () => {
           }}
         >
           <Board
+            rows={state.rows}
+            columns={state.columns}
             pieces={state.pieces}
             highlight={highlight}
             onCellClick={handleCellClick}
