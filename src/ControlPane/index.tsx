@@ -1,4 +1,5 @@
 import MiscControls from './MiscControls'
+import SimulationControls from './SimulationControls'
 import SizeControls from './SizeControls'
 
 const ControlPane = () => {
@@ -7,6 +8,7 @@ const ControlPane = () => {
       <h2 className="p-4 font-bold border-b-4 border-[#eee]">Controls</h2>
       <MiscControls />
       <SizeControls />
+      <SimulationControls />
     </div>
   )
 }

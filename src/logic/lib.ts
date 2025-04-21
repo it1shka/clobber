@@ -19,3 +19,7 @@ export const getStateDiff = (
   }
   return difference
 }
+
+export const getChessboardColor = (row: number, column: number) => {
+  return (column + (row % 2)) % 2 === 0 ? 'white' : 'black'
+}

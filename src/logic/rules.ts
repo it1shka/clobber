@@ -1,3 +1,5 @@
+import { getChessboardColor } from './lib'
+
 export type Player = 'black' | 'white'
 
 export type Piece = {
@@ -18,11 +20,11 @@ export class GameState {
     const pieces: Piece[] = []
     for (let row = 0; row < rows; row++) {
       for (let column = 0; column < columns; column++) {
-        const isWhite = (row * columns + column) % 2 === 0
+        const color = getChessboardColor(row, column)
         pieces.push({
           row,
           column,
-          color: isWhite ? 'white' : 'black',
+          color,
         })
       }
     }

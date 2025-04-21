@@ -1,5 +1,6 @@
 import type { FC } from 'react'
-import { Position, MainPartProps } from './types'
+import type { Position, MainPartProps } from './types'
+import { getChessboardColor } from '../logic/lib'
 
 const MainPart: FC<MainPartProps> = ({
   rows,
@@ -91,7 +92,7 @@ const MainPart: FC<MainPartProps> = ({
                   {pieceElement}
                 </div>
               )
-            case index % 2 === 0:
+            case getChessboardColor(row, column) === 'white':
               return (
                 <div className="bg-white p-1 w-full h-full">{pieceElement}</div>
               )

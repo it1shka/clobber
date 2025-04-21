@@ -5,13 +5,15 @@ import { getStateDiff } from './logic/lib'
 const DEFAULT_ROWS = 6
 const DEFAULT_COLUMNS = 5
 
-type GameStateStore = {
+type GameStateStoreVars = {
   memory: Readonly<GameState>[]
   pointer: number
+  relaxedMoves: boolean
+}
 
+type GameStateStoreActions = {
   getUnderPointer: () => Readonly<GameState>
   getActiveHistory: () => Readonly<GameState>[]
-
   restart: () => void
   resizeAndRestart: (rows: number, columns: number) => void
   move: (
@@ -22,14 +24,24 @@ type GameStateStore = {
   ) => void
   back: () => void
   forth: () => void
+  setRelaxation: (relaxedFlag: boolean) => void
+}
+
+type GameStateStore = GameStateStoreVars & GameStateStoreActions
+
+const createInitialState = (gameState: Readonly<GameState>) => {
+  return {
+    memory: [gameState],
+    pointer: 0,
+    relaxedMoves: false,
+  } satisfies GameStateStoreVars
 }
 
 export const useGameState = create<GameStateStore>((set, get) => {
   const initialState = GameState.initial(DEFAULT_ROWS, DEFAULT_COLUMNS)
 
   return {
-    memory: [initialState],
-    pointer: 0,
+    ...createInitialState(initialState),
 
     getUnderPointer: () => get().memory[get().pointer],
     getActiveHistory: () => get().memory.slice(0, get().pointer + 1),
@@ -40,8 +52,7 @@ export const useGameState = create<GameStateStore>((set, get) => {
         const newInitialState = GameState.initial(rows, columns)
         return {
           ...prev,
-          memory: [newInitialState],
-          pointer: 0,
+          ...createInitialState(newInitialState),
         }
       })
     },
@@ -51,8 +62,7 @@ export const useGameState = create<GameStateStore>((set, get) => {
       set(prev => {
         return {
           ...prev,
-          memory: [newInitialState],
-          pointer: 0,
+          ...createInitialState(newInitialState),
         }
       })
     },
@@ -93,6 +103,15 @@ export const useGameState = create<GameStateStore>((set, get) => {
         return {
           ...prev,
           pointer: prev.pointer + 1,
+        }
+      })
+    },
+
+    setRelaxation: relaxedFlag => {
+      set(prev => {
+        return {
+          ...prev,
+          relaxedMoves: relaxedFlag,
         }
       })
     },
