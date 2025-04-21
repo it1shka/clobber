@@ -70,7 +70,13 @@ export const useGameState = create<GameStateStore>((set, get) => {
     move: (fromRow, fromColumn, toRow, toColumn) => {
       set(prev => {
         const prevState = prev.getUnderPointer()
-        const nextState = prevState.move(fromRow, fromColumn, toRow, toColumn)
+        const nextState = prevState.move(
+          fromRow,
+          fromColumn,
+          toRow,
+          toColumn,
+          prev.relaxedMoves,
+        )
         if (nextState === null) {
           return prev
         }
@@ -141,10 +147,19 @@ export const useGameStateComputedAttrs = () => {
   const stateDiff =
     previousState !== null ? getStateDiff(previousState, state) : []
 
+  const relaxedMoves = useGameState(({ relaxedMoves }) => {
+    return relaxedMoves
+  })
+
+  const possibleMoves = state.getPossibleMoves(relaxedMoves)
+  const possibleOutcomes = state.getPossibleOutcomes(relaxedMoves)
+
   return {
     state,
     canRollback,
     canForward,
     stateDiff,
+    possibleMoves,
+    possibleOutcomes,
   } as const
 }
