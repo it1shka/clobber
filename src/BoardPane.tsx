@@ -5,7 +5,7 @@ import { useGameState, useGameStateComputedAttrs } from './useGameState'
 const DIFF_COLOR = '#e2cd1a'
 
 const BoardPane = () => {
-  const { move } = useGameState()
+  const { move, relaxedMoves } = useGameState()
   const { state, stateDiff } = useGameStateComputedAttrs()
   const [start, setStart] = useState<readonly [number, number] | null>(null)
 
@@ -18,10 +18,12 @@ const BoardPane = () => {
   }, [])
 
   const possibilitiesHighlight = start
-    ? [...state.movesAt(...start), start].map(([row, column]) => ({
-        row,
-        column,
-      }))
+    ? [...state.movesAt(...start, relaxedMoves), start].map(
+        ([row, column]) => ({
+          row,
+          column,
+        }),
+      )
     : []
 
   const differenceHighlight = stateDiff
@@ -51,9 +53,11 @@ const BoardPane = () => {
       setStart(null)
       return
     }
-    const isMove = state.movesAt(...start).some(([moveRow, moveColumn]) => {
-      return moveRow === row && moveColumn === column
-    })
+    const isMove = state
+      .movesAt(...start, relaxedMoves)
+      .some(([moveRow, moveColumn]) => {
+        return moveRow === row && moveColumn === column
+      })
     if (isMove) {
       move(startRow, startColumn, row, column)
       setStart(null)

@@ -1,3 +1,5 @@
+import { getChessboardColor } from './lib'
+
 export type Player = 'black' | 'white'
 
 export type Piece = {
@@ -18,11 +20,11 @@ export class GameState {
     const pieces: Piece[] = []
     for (let row = 0; row < rows; row++) {
       for (let column = 0; column < columns; column++) {
-        const isWhite = (row * columns + column) % 2 === 0
+        const color = getChessboardColor(row, column)
         pieces.push({
           row,
           column,
-          color: isWhite ? 'white' : 'black',
+          color,
         })
       }
     }
@@ -117,7 +119,7 @@ export class GameState {
     return piece
   }
 
-  movesAt = (row: number, column: number) => {
+  movesAt = (row: number, column: number, relaxed: boolean) => {
     const neighbors = this.neighborsAt(row, column)
     const piece = this.pieceAt(row, column)
     if (piece === null || piece.color !== this.turn) {
@@ -125,15 +127,18 @@ export class GameState {
     }
     return neighbors.filter(([neighborRow, neighborColumn]) => {
       const enemyPiece = this.pieceAt(neighborRow, neighborColumn)
+      if (relaxed) {
+        return enemyPiece?.color !== this.turn
+      }
       return enemyPiece !== null && enemyPiece.color === this.enemyTurn
     })
   }
 
-  get possibleMoves() {
+  getPossibleMoves = (relaxed: boolean) => {
     return this.pieces
       .filter(({ color }) => color === this.turn)
       .reduce((acc, { row, column }) => {
-        const localMoves = this.movesAt(row, column).map(
+        const localMoves = this.movesAt(row, column, relaxed).map(
           ([moveRow, moveColumn]) => {
             return [row, column, moveRow, moveColumn] as const
           },
@@ -142,9 +147,9 @@ export class GameState {
       }, new Array<readonly [number, number, number, number]>())
   }
 
-  get possibleOutcomes(): Array<Readonly<GameState>> {
-    return this.possibleMoves
-      .map(move => this.move(...move))
+  getPossibleOutcomes = (relaxed: boolean): Array<Readonly<GameState>> => {
+    return this.getPossibleMoves(relaxed)
+      .map(move => this.move(...move, relaxed))
       .filter((move): move is Readonly<GameState> => move !== null)
   }
 
@@ -153,8 +158,9 @@ export class GameState {
     fromColumn: number,
     toRow: number,
     toColumn: number,
+    relaxed: boolean,
   ): Readonly<GameState> | null => {
-    const moves = this.movesAt(fromRow, fromColumn)
+    const moves = this.movesAt(fromRow, fromColumn, relaxed)
     const isPossible = moves.some(([row, column]) => {
       return row === toRow && column === toColumn
     })

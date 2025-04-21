@@ -11,6 +11,7 @@ import {
 import TreeNode from './TreeNode'
 import { GameStateNode, useEdges, useNodes, useReset } from './graphHooks'
 import { mergeNodes } from './nodePosition'
+import { useGameState } from '../useGameState'
 
 const Graph = () => {
   useReset()
@@ -18,10 +19,12 @@ const Graph = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState<GameStateNode>([])
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([])
 
+  const { relaxedMoves } = useGameState()
+
   const graphNodes = useNodes()
   useEffect(() => {
-    setNodes(prev => mergeNodes(prev, graphNodes))
-  }, [graphNodes, setNodes])
+    setNodes(prev => mergeNodes(prev, graphNodes, relaxedMoves))
+  }, [graphNodes, setNodes, relaxedMoves])
 
   const graphEdges = useEdges()
   useEffect(() => {

@@ -7,7 +7,11 @@ const calcDistance = (n: number) => {
   return MIN_RADIUS + RADIUS_DELTA * n
 }
 
-export const mergeNodes = (prev: GameStateNode[], next: GameStateNode[]) => {
+export const mergeNodes = (
+  prev: GameStateNode[],
+  next: GameStateNode[],
+  relaxed: boolean,
+) => {
   return next.map(nextNode => {
     const prevNode = prev.find(({ id }) => id === nextNode.id)
     if (prevNode !== undefined) {
@@ -15,9 +19,9 @@ export const mergeNodes = (prev: GameStateNode[], next: GameStateNode[]) => {
     }
 
     const parent = prev.find(({ data }) => {
-      return data.possibleOutcomes.some(
-        outcome => outcome.identifier === nextNode.id,
-      )
+      return data
+        .getPossibleOutcomes(relaxed)
+        .some(outcome => outcome.identifier === nextNode.id)
     })
 
     if (parent === undefined) {
@@ -27,7 +31,7 @@ export const mergeNodes = (prev: GameStateNode[], next: GameStateNode[]) => {
       }
     }
 
-    const parentOutcomes = parent.data.possibleOutcomes
+    const parentOutcomes = parent.data.getPossibleOutcomes(relaxed)
     const index = parentOutcomes.findIndex(({ identifier }) => {
       return identifier === nextNode.id
     })!

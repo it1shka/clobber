@@ -4,3 +4,9 @@ export type SizeControlProps = {
   onChange: (newValue: number) => void
   limits: readonly [number, number]
 }
+
+export type CheckboxControlProps = {
+  title: string
+  value: boolean
+  onChange: (newValue: boolean) => void
+}

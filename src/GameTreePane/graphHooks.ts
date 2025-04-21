@@ -1,6 +1,6 @@
 import type { Node, Edge } from '@xyflow/react'
 import { GameState } from '../logic/rules'
-import { useGameStateComputedAttrs } from '../useGameState'
+import { useGameState, useGameStateComputedAttrs } from '../useGameState'
 import useTreePaneState from './state'
 import { useEffect } from 'react'
 
@@ -15,14 +15,15 @@ export const useReset = () => {
 }
 
 export const useNodes = (): GameStateNode[] => {
+  const { relaxedMoves } = useGameState()
   const { state } = useGameStateComputedAttrs()
   const { expandedNodes } = useTreePaneState()
 
   const identifiers = expandedNodes
     .map(nodeId => {
-      return GameState.fromIdentifier(nodeId)!.possibleOutcomes.map(
-        outcome => outcome.identifier,
-      )
+      const nodeState = GameState.fromIdentifier(nodeId)!
+      const nodeOutcomes = nodeState.getPossibleOutcomes(relaxedMoves)
+      return nodeOutcomes.map(outcome => outcome.identifier)
     })
     .reduce((acc, elem) => [...acc, ...elem], [state.identifier])
 
@@ -41,11 +42,13 @@ export const useNodes = (): GameStateNode[] => {
 }
 
 export const useEdges = (): Edge[] => {
+  const { relaxedMoves } = useGameState()
   const { expandedNodes } = useTreePaneState()
   return expandedNodes
     .map(sourceId => {
       const sourceState = GameState.fromIdentifier(sourceId)!
-      return sourceState.possibleOutcomes.map(outcome => {
+      const sourceOutcomes = sourceState.getPossibleOutcomes(relaxedMoves)
+      return sourceOutcomes.map(outcome => {
         const targetId = outcome.identifier
         return {
           id: `${sourceId}-${targetId}`,
