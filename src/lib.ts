@@ -1,3 +1,5 @@
+import { useEffect } from 'react'
+
 export const cached = <A extends unknown[], R>(fn: (...args: A) => R) => {
   const cache = new Map<string, R>()
   return (...args: A) => {
@@ -10,4 +12,19 @@ export const cached = <A extends unknown[], R>(fn: (...args: A) => R) => {
     cache.set(key, computed)
     return computed
   }
+}
+
+export const useThrottle = (
+  action: () => void,
+  delay: number,
+  dependencies: unknown[],
+) => {
+  useEffect(() => {
+    const handle = setTimeout(() => {
+      action()
+    }, delay)
+    return () => {
+      clearTimeout(handle)
+    }
+  }, [action, delay, ...dependencies])
 }

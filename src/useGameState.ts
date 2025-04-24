@@ -53,6 +53,7 @@ export const useGameState = create<GameStateStore>((set, get) => {
         return {
           ...prev,
           ...createInitialState(newInitialState),
+          relaxedMoves: prev.relaxedMoves,
         }
       })
     },
@@ -63,6 +64,7 @@ export const useGameState = create<GameStateStore>((set, get) => {
         return {
           ...prev,
           ...createInitialState(newInitialState),
+          relaxedMoves: prev.relaxedMoves,
         }
       })
     },

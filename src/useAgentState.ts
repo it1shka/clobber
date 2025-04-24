@@ -2,9 +2,9 @@ import { create } from 'zustand'
 import type { GameState } from './logic/rules'
 import { HeuristicCatalog } from './logic/heuristics'
 
-type Heuristic = keyof typeof HeuristicCatalog
+export type Heuristic = keyof typeof HeuristicCatalog
 
-type HeuristicWeights = {
+export type HeuristicWeights = {
   [heuristic in Heuristic]: number
 }
 
@@ -26,9 +26,14 @@ type AgentStateActions = {
 
 type AgentStateStore = AgentStateVars & AgentStateActions
 
+const DEFAULT_HEURISTIC_VALUE = 0
+
 const createInitialState = () => {
   const initialWeights = Object.fromEntries(
-    Object.keys(HeuristicCatalog).map(heuristic => [heuristic, 1]),
+    Object.keys(HeuristicCatalog).map(heuristic => [
+      heuristic,
+      DEFAULT_HEURISTIC_VALUE,
+    ]),
   ) as HeuristicWeights
   return {
     enabled: false,
