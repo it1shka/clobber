@@ -9,10 +9,12 @@ const AgentControl = ({ title, agent }: AgentControlProps) => {
   const {
     enabled,
     throttleTime,
+    depth,
     heuristicWeights,
 
     setEnabled,
     setThrottleTime,
+    setDepth,
     setHeuristicWeight,
   } = useAgentState(agent)
 
@@ -30,6 +32,13 @@ const AgentControl = ({ title, agent }: AgentControlProps) => {
         onChange={setThrottleTime}
         min={250}
         max={5000}
+      />
+      <NumberControl
+        title="Depth"
+        value={depth}
+        onChange={setDepth}
+        min={1}
+        max={8}
       />
       {Object.entries(heuristicWeights).map(([heuristic, weight]) => {
         return (

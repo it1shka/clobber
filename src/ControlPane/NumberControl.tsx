@@ -5,14 +5,16 @@ const NumberControl = ({
   title,
   value,
   onChange,
-  ...rest
+  min,
+  max,
 }: NumberControlProps) => {
   const handleChange: ChangeEventHandler<HTMLInputElement> = event => {
     const value = Number(event.target.value)
     if (Number.isNaN(value)) {
       return
     }
-    onChange(value)
+    const limitedValue = Math.max(min, Math.min(max, value))
+    onChange(limitedValue)
   }
 
   return (
@@ -24,7 +26,8 @@ const NumberControl = ({
         placeholder={title}
         value={value}
         onChange={handleChange}
-        {...rest}
+        min={min}
+        max={max}
       />
     </div>
   )

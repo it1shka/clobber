@@ -1,4 +1,3 @@
-import { InputHTMLAttributes } from 'react'
 import type { GameState } from '../logic/rules'
 
 export type SizeControlProps = {
@@ -23,4 +22,6 @@ export type NumberControlProps = {
   title: string
   value: number
   onChange: (value: number) => void
-} & Omit<InputHTMLAttributes<HTMLInputElement>, 'title' | 'value' | 'onChange'>
+  min: number
+  max: number
+}

@@ -11,6 +11,7 @@ type HeuristicWeights = {
 type AgentStateVars = {
   enabled: boolean
   throttleTime: number
+  depth: number
   heuristicWeights: HeuristicWeights
 }
 
@@ -18,6 +19,7 @@ type AgentStateActions = {
   setEnabled(enabled: boolean): void
   toggleEnabled(): void
   setThrottleTime(throttleTime: number): void
+  setDepth(depth: number): void
   setHeuristicWeight(heuristic: Heuristic, weight: number): void
   adjustHeuristicWeights(weights: HeuristicWeights): void
 }
@@ -31,6 +33,7 @@ const createInitialState = () => {
   return {
     enabled: false,
     throttleTime: 250,
+    depth: 3,
     heuristicWeights: initialWeights,
   } satisfies AgentStateVars
 }
@@ -63,6 +66,15 @@ const createAgentStateStore = () => {
           return {
             ...prev,
             throttleTime,
+          }
+        })
+      },
+
+      setDepth: depth => {
+        set(prev => {
+          return {
+            ...prev,
+            depth,
           }
         })
       },
