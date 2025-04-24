@@ -1,6 +1,8 @@
+import type { HeuristicCatalog } from '../logic/heuristics'
 import { useAgentState } from '../useAgentState'
 import CheckboxControl from './CheckboxControl'
 import NumberControl from './NumberControl'
+import SizeControl from './SizeControl'
 import type { AgentControlProps } from './types'
 
 const AgentControl = ({ title, agent }: AgentControlProps) => {
@@ -12,7 +14,6 @@ const AgentControl = ({ title, agent }: AgentControlProps) => {
     setEnabled,
     setThrottleTime,
     setHeuristicWeight,
-    adjustHeuristicWeights,
   } = useAgentState(agent)
 
   return (
@@ -30,6 +31,22 @@ const AgentControl = ({ title, agent }: AgentControlProps) => {
         min={250}
         max={5000}
       />
+      {Object.entries(heuristicWeights).map(([heuristic, weight]) => {
+        return (
+          <SizeControl
+            key={heuristic}
+            title={heuristic}
+            value={weight}
+            onChange={newWeight => {
+              setHeuristicWeight(
+                heuristic as keyof typeof HeuristicCatalog,
+                newWeight,
+              )
+            }}
+            limits={[0, 10]}
+          />
+        )
+      })}
     </div>
   )
 }
