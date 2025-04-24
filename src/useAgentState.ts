@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import type { GameState } from './logic/rules'
 import { HeuristicCatalog } from './logic/heuristics'
 
 type Heuristic = keyof typeof HeuristicCatalog
@@ -14,6 +15,7 @@ type AgentStateVars = {
 }
 
 type AgentStateActions = {
+  setEnabled(enabled: boolean): void
   toggleEnabled(): void
   setThrottleTime(throttleTime: number): void
   setHeuristicWeight(heuristic: Heuristic, weight: number): void
@@ -37,6 +39,15 @@ const createAgentStateStore = () => {
   return create<AgentStateStore>(set => {
     return {
       ...createInitialState(),
+
+      setEnabled: enabled => {
+        set(prev => {
+          return {
+            ...prev,
+            enabled,
+          }
+        })
+      },
 
       toggleEnabled: () => {
         set(prev => {
@@ -81,5 +92,12 @@ const createAgentStateStore = () => {
   })
 }
 
-export const useFirstAgentStore = createAgentStateStore()
-export const useSecondAgentStore = createAgentStateStore()
+export const useBlackAgentStateStore = createAgentStateStore()
+export const useWhiteAgentStateStore = createAgentStateStore()
+
+export const useAgentState = (agent: GameState['turn']) => {
+  const blackState = useBlackAgentStateStore()
+  const whiteState = useWhiteAgentStateStore()
+
+  return agent === 'black' ? blackState : whiteState
+}
