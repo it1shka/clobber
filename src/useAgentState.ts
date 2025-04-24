@@ -1,113 +1,85 @@
-import { create } from "zustand"
-import type { GameState } from "./logic/rules" 
-import { HeuristicCatalog } from './logic/heuristics.ts'
+import { create } from 'zustand'
+import { HeuristicCatalog } from './logic/heuristics'
 
-export type Agent = GameState['turn']
-export type Heuristic = keyof (typeof HeuristicCatalog)
+type Heuristic = keyof typeof HeuristicCatalog
+
+type HeuristicWeights = {
+  [heuristic in Heuristic]: number
+}
 
 type AgentStateVars = {
-  enabled: {
-    [agent in Agent]: boolean
-  }
-  weights: {
-    [agent in Agent]: {
-      [heuristic in Heuristic]: number
-    }
-  }
+  enabled: boolean
+  throttleTime: number
+  heuristicWeights: HeuristicWeights
 }
 
 type AgentStateActions = {
-  setEnabled: (agent: Agent, enabled: boolean) => void
-  setHeuristicWeight: (agent: Agent, heuristic: Heuristic, weight: number) => void
-  adjustHeuristicWeights: (agent: Agent, weights: AgentStateVars['weights'][Agent]) => void
+  toggleEnabled(): void
+  setThrottleTime(throttleTime: number): void
+  setHeuristicWeight(heuristic: Heuristic, weight: number): void
+  adjustHeuristicWeights(weights: HeuristicWeights): void
 }
 
-type AgentStateStore =
-  & AgentStateVars
-  & AgentStateActions
+type AgentStateStore = AgentStateVars & AgentStateActions
 
 const createInitialState = () => {
-  const defaultWeights = Object.fromEntries(
-    Object
-      .keys(HeuristicCatalog)
-      .map(heuristic => [heuristic, 1])
-  ) as AgentStateVars['weights'][Agent]
+  const initialWeights = Object.fromEntries(
+    Object.keys(HeuristicCatalog).map(heuristic => [heuristic, 1]),
+  ) as HeuristicWeights
   return {
-    enabled: {
-      black: false,
-      white: false,
-    },
-    weights: {
-      black: defaultWeights,
-      white: defaultWeights,
-    },
+    enabled: false,
+    throttleTime: 250,
+    heuristicWeights: initialWeights,
   } satisfies AgentStateVars
 }
 
-export const useAgentState = create<AgentStateStore>((set) => {
-  return {
-    ...createInitialState(),
+const createAgentStateStore = () => {
+  return create<AgentStateStore>(set => {
+    return {
+      ...createInitialState(),
 
-    setEnabled: (agent, enabled) => {
-      set(prev => {
-        const nextEnabled = { 
-          ...prev.enabled,
-          [agent]: enabled,
-        }
-        return {
-          ...prev,
-          enabled: nextEnabled,
-        }
-      })
-    },
+      toggleEnabled: () => {
+        set(prev => {
+          return {
+            ...prev,
+            enabled: !prev.enabled,
+          }
+        })
+      },
 
-    setHeuristicWeight: (agent, heuristic, weight) => {
-      set(prev => {
-        const nextWeights = {
-          ...prev.weights,
-          [agent]: {
-            ...prev.weights[agent],
+      setThrottleTime: throttleTime => {
+        set(prev => {
+          return {
+            ...prev,
+            throttleTime,
+          }
+        })
+      },
+
+      setHeuristicWeight: (heuristic, weight) => {
+        set(prev => {
+          const nextWeights = {
+            ...prev.heuristicWeights,
             [heuristic]: weight,
-          },
-        }
-        return {
-          ...prev,
-          weights: nextWeights,
-        }
-      })
-    },
+          }
+          return {
+            ...prev,
+            heuristicWeights: nextWeights,
+          }
+        })
+      },
 
-    adjustHeuristicWeights: (agent, weights) => {
-      set(prev => {
-        const nextWeights = {
-          ...prev.weights,
-          [agent]: weights,
-        }
-        return {
-          ...prev,
-          nextWeights,
-        }
-      })
-    },
-  }
-})
-
-export type SingleAgentState = {
-  [property in keyof AgentStateVars]: AgentStateVars[property][Agent]
+      adjustHeuristicWeights: (weights: HeuristicWeights) => {
+        set(prev => {
+          return {
+            ...prev,
+            heuristicWeights: weights,
+          }
+        })
+      },
+    }
+  })
 }
 
-const agentSelector = (agent: Agent) => (state: AgentStateVars) => {
-  return {
-    enabled: state.enabled[agent],
-    weights: state.weights[agent],
-  } satisfies SingleAgentState
-}
-
-export const useAgentStateComputedAttrs = () => {
-  const whiteAgentState = useAgentState(agentSelector('white'))
-  const blackAgentState = useAgentState(agentSelector('black'))
-  return {
-    whiteAgentState,
-    blackAgentState,
-  } as const
-}
+export const useFirstAgentStore = createAgentStateStore()
+export const useSecondAgentStore = createAgentStateStore()
