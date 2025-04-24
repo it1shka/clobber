@@ -51,7 +51,7 @@ const MainPart: FC<MainPartProps> = ({
         gridTemplateColumns: `repeat(${columns}, 1fr)`,
       }}
     >
-      {positions.map(({ row, column }, index) => {
+      {positions.map(({ row, column }) => {
         const pieceColor = getPieceColorAt(row, column)
         const pieceElement = (() => {
           switch (pieceColor) {
@@ -69,6 +69,7 @@ const MainPart: FC<MainPartProps> = ({
         })()
         const isHighlighted = isHighlightedAt(row, column)
         const highlightColor = getHighlightColor(row, column)
+        const chessboardColor = getChessboardColor(row, column)
         const content = (() => {
           switch (true) {
             case isHighlighted && highlightColor !== undefined:
@@ -80,19 +81,19 @@ const MainPart: FC<MainPartProps> = ({
                   {pieceElement}
                 </div>
               )
-            case isHighlighted && index % 2 === 0:
+            case isHighlighted && chessboardColor === 'white':
               return (
                 <div className="bg-pink-200 p-1 w-full h-full">
                   {pieceElement}
                 </div>
               )
-            case isHighlighted && index % 2 !== 0:
+            case isHighlighted && chessboardColor === 'black':
               return (
                 <div className="bg-pink-700 p-1 w-full h-full">
                   {pieceElement}
                 </div>
               )
-            case getChessboardColor(row, column) === 'white':
+            case chessboardColor === 'white':
               return (
                 <div className="bg-white p-1 w-full h-full">{pieceElement}</div>
               )

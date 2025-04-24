@@ -23,3 +23,43 @@ export const getStateDiff = (
 export const getChessboardColor = (row: number, column: number) => {
   return (column + (row % 2)) % 2 === 0 ? 'white' : 'black'
 }
+
+export const oppositeTurn = (turn: GameState['turn']): GameState['turn'] => {
+  return turn === 'black' ? 'white' : 'black'
+}
+
+export const getConnectedComponentsCount = (
+  perspective: GameState['turn'],
+  state: Readonly<GameState>,
+) => {
+  let marker = 0
+  const markers = new Map<number, number>()
+
+  const markGroup = (startRow: number, startColumn: number) => {
+    const stack = new Array<readonly [number, number]>()
+    stack.push([startRow, startColumn])
+    while (stack.length > 0) {
+      const [currentRow, currentColumn] = stack.pop()!
+      const index = currentRow * state.columns + currentColumn
+      markers.set(index, marker)
+      for (const neighbor of state.neighborsAt(currentRow, currentColumn)) {
+        if (state.pieceAt(...neighbor)?.color !== perspective) {
+          continue
+        }
+        stack.push(neighbor)
+      }
+    }
+    marker++
+  }
+
+  for (const piece of state.pieces) {
+    const { color, row, column } = piece
+    const index = row * state.columns + column
+    if (color !== perspective || markers.has(index)) {
+      continue
+    }
+    markGroup(row, column)
+  }
+
+  return marker
+}
