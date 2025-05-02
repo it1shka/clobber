@@ -8,6 +8,7 @@ import {
   useAgentState,
 } from './useAgentState'
 import { useGameState, useGameStateComputedAttrs } from './useGameState'
+import { useMinimaxStore } from './useMinimaxStore'
 
 const useCompoundHeuristic = (
   agent: GameState['turn'],
@@ -30,16 +31,13 @@ const useCompoundHeuristic = (
 export const useMinimax = (agent: GameState['turn']) => {
   const { enabled, throttleTime, depth, heuristicWeights } =
     useAgentState(agent)
-
   const { move, relaxedMoves } = useGameState()
   const { state } = useGameStateComputedAttrs()
+  const { remote, addResult } = useMinimaxStore()
 
   const heuristic = useCompoundHeuristic(agent, relaxedMoves, heuristicWeights)
-
-  const makeMove = () => {
-    if (!enabled || state.turn !== agent) {
-      return
-    }
+  const makeMoveLocal = () => {
+    const startTime = Date.now()
     let bestScore = -Infinity
     let bestMove: readonly [number, number, number, number] | null = null
     for (const move of state.getPossibleMoves(relaxedMoves)) {
@@ -56,10 +54,30 @@ export const useMinimax = (agent: GameState['turn']) => {
         bestScore = currentScore
       }
     }
+    const endTime = Date.now()
+    const elapsedTime = endTime - startTime
     if (bestMove !== null) {
       move(...bestMove)
+      addResult(elapsedTime)
     }
   }
 
-  useThrottle(makeMove, throttleTime, [state])
+  const makeMove = () => {
+    if (!enabled || state.turn !== agent) {
+      return
+    }
+    if (remote) {
+      // TODO: remote minimax
+    } else {
+      makeMoveLocal()
+    }
+  }
+
+  useThrottle(
+    async () => {
+      makeMove()
+    },
+    throttleTime,
+    [state],
+  )
 }
