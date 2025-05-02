@@ -1,6 +1,6 @@
 import type { Node, Edge } from '@xyflow/react'
 import { GameState } from '../logic/rules'
-import { useGameState, useGameStateComputedAttrs } from '../useGameState'
+import { useGameState, useGameStateComputedAttrs } from '../stores/useGameState'
 import useTreePaneState from './state'
 import { useEffect } from 'react'
 

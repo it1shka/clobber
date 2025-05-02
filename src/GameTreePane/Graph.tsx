@@ -11,7 +11,7 @@ import {
 import TreeNode from './TreeNode'
 import { GameStateNode, useEdges, useNodes, useReset } from './graphHooks'
 import { mergeNodes } from './nodePosition'
-import { useGameState } from '../useGameState'
+import { useGameState } from '../stores/useGameState'
 
 const Graph = () => {
   useReset()

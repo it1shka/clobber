@@ -1,7 +1,7 @@
-import { useThrottle } from './lib'
-import { HeuristicCatalog } from './logic/heuristics'
-import { minimaxABP } from './logic/minimax'
-import type { GameState } from './logic/rules'
+import { useThrottle } from '../lib'
+import { HeuristicCatalog } from '../logic/heuristics'
+import { minimaxABP } from '../logic/minimax'
+import type { GameState } from '../logic/rules'
 import {
   type Heuristic,
   type HeuristicWeights,

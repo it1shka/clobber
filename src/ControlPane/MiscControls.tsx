@@ -1,5 +1,5 @@
 import useTreePaneState from '../GameTreePane/state'
-import { useGameState, useGameStateComputedAttrs } from '../useGameState'
+import { useGameState, useGameStateComputedAttrs } from '../stores/useGameState'
 
 const MiscControls = () => {
   const { open } = useTreePaneState()
