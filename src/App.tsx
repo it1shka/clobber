@@ -2,7 +2,8 @@ import { createPortal } from 'react-dom'
 import BoardPane from './BoardPane'
 import ControlPane from './ControlPane'
 import GameTreePane from './GameTreePane'
-import { useMinimax } from './useMinimax'
+import ChartPane from './ChartPane'
+import { useMinimax } from './stores/useMinimax'
 
 const App = () => {
   useMinimax('black')
@@ -19,6 +20,7 @@ const App = () => {
         </div>
       </div>
       {createPortal(<GameTreePane />, document.body)}
+      {createPortal(<ChartPane />, document.body)}
     </>
   )
 }

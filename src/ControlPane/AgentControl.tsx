@@ -1,5 +1,5 @@
 import type { HeuristicCatalog } from '../logic/heuristics'
-import { useAgentState } from '../useAgentState'
+import { useAgentState } from '../stores/useAgentState'
 import CheckboxControl from './CheckboxControl'
 import NumberControl from './NumberControl'
 import SizeControl from './SizeControl'

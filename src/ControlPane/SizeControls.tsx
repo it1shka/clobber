@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import SizeControl from './SizeControl'
-import { useGameState, useGameStateComputedAttrs } from '../useGameState'
+import { useGameState, useGameStateComputedAttrs } from '../stores/useGameState'
 
 const SizeControls = () => {
   const [rows, setRows] = useState(6)

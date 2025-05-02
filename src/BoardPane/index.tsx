@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import Board from './Board'
-import { useGameState, useGameStateComputedAttrs } from './useGameState'
+import Board from '../Board'
+import { useGameState, useGameStateComputedAttrs } from '../stores/useGameState'
 
 const DIFF_COLOR = '#e2cd1a'
 

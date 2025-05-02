@@ -1,5 +1,5 @@
 import CheckboxControl from './CheckboxControl'
-import { useGameState } from '../useGameState'
+import { useGameState } from '../stores/useGameState'
 import AgentControl from './AgentControl'
 
 const SimulationControls = () => {

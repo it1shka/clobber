@@ -1,6 +1,6 @@
 import { create } from 'zustand'
-import type { GameState } from './logic/rules'
-import { HeuristicCatalog } from './logic/heuristics'
+import type { GameState } from '../logic/rules'
+import { HeuristicCatalog } from '../logic/heuristics'
 
 export type Heuristic = keyof typeof HeuristicCatalog
 

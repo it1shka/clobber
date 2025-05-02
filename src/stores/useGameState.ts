@@ -1,6 +1,6 @@
 import { create } from 'zustand'
-import { GameState } from './logic/rules'
-import { getStateDiff } from './logic/lib'
+import { GameState } from '../logic/rules'
+import { getStateDiff } from '../logic/lib'
 
 const DEFAULT_ROWS = 6
 const DEFAULT_COLUMNS = 5
