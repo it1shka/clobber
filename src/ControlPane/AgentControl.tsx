@@ -30,7 +30,7 @@ const AgentControl = ({ title, agent }: AgentControlProps) => {
         title="Throttle time"
         value={throttleTime}
         onChange={setThrottleTime}
-        min={250}
+        min={0}
         max={5000}
       />
       <NumberControl
