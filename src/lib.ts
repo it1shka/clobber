@@ -28,3 +28,19 @@ export const useThrottle = (
     }
   }, [action, delay, ...dependencies])
 }
+
+export const findBest = <T>(array: T[], evaluation: (item: T) => number) => {
+  if (array.length <= 0) {
+    return null
+  }
+  return array
+    .map(item => [item, evaluation(item)] as const)
+    .reduce((acc, elem) => {
+      const [_, bestScore] = acc
+      const [__, currentScore] = elem
+      if (currentScore > bestScore) {
+        return elem
+      }
+      return acc
+    })[0]
+}
