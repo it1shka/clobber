@@ -3,11 +3,11 @@ import BoardPane from './BoardPane'
 import ControlPane from './ControlPane'
 import GameTreePane from './GameTreePane'
 import ChartPane from './ChartPane'
-import { useMinimax } from './stores/useMinimax'
+import { useAutoplay } from './logic/useAutoplay'
 
 const App = () => {
-  useMinimax('black')
-  useMinimax('white')
+  useAutoplay('black')
+  useAutoplay('white')
 
   return (
     <>
