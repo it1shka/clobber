@@ -4,15 +4,19 @@ import { type Heuristic, useAgentState } from '../stores/useAgentState'
 import { useGameState, useGameStateComputedAttrs } from '../stores/useGameState'
 import { useMinimaxStore } from '../stores/useMinimaxStore'
 import { HeuristicCatalog } from './heuristics'
-import { minimaxABP } from './minimax'
+import { minimax, minimaxABP } from './minimax'
 
 type MinimaxEvaluator = (state: Readonly<GameState>) => Promise<number>
 
 const useLocalMinimax = (agent: GameState['turn']): MinimaxEvaluator => {
   const { relaxedMoves } = useGameState()
   const { depth, heuristicWeights } = useAgentState(agent)
+  const { unoptimized } = useMinimaxStore()
 
   const evaluate = (state: Readonly<GameState>) => {
+    if (state.getPossibleMoves(relaxedMoves).length <= 0) {
+      return state.turn === agent ? -Infinity : Infinity
+    }
     let totalValue = 0
     for (const [heuristic, evaluation] of Object.entries(HeuristicCatalog)) {
       const weight = heuristicWeights[heuristic as Heuristic]
@@ -24,8 +28,10 @@ const useLocalMinimax = (agent: GameState['turn']): MinimaxEvaluator => {
     return totalValue
   }
 
+  const minimaxVariant = unoptimized ? minimax : minimaxABP
+
   return async (state: Readonly<GameState>): Promise<number> => {
-    return minimaxABP({
+    return minimaxVariant({
       state,
       evaluate,
       outcomes: state => state.getPossibleOutcomes(relaxedMoves),
@@ -38,8 +44,10 @@ const useLocalMinimax = (agent: GameState['turn']): MinimaxEvaluator => {
 const useRemoteMinimax = (agent: GameState['turn']): MinimaxEvaluator => {
   const { relaxedMoves } = useGameState()
   const { depth, heuristicWeights } = useAgentState(agent)
+  const { unoptimized, addRemoteResult } = useMinimaxStore()
+
   return async (state: Readonly<GameState>): Promise<number> => {
-    const response = await fetch('/api/minimax', {
+    const response = await fetch('/api/minimax-verbose', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -57,12 +65,16 @@ const useRemoteMinimax = (agent: GameState['turn']): MinimaxEvaluator => {
         },
         depth,
         maximizing: true,
+        kind: unoptimized ? 'unoptimized' : 'alpha-beta-pruning',
       }),
     })
     const responseValue = (await response.json()) as {
-      nano: number
       score: number
+      elapsed_time: number
+      visited_nodes: number
+      prunings: number
     }
+    addRemoteResult(responseValue)
     return responseValue.score
   }
 }
