@@ -1,62 +1,50 @@
-import {
-  BarController,
-  BarElement,
-  CategoryScale,
-  Chart,
-  LinearScale,
-  Tooltip,
-} from 'chart.js'
+import { Chart } from 'chart.js'
 import { useEffect, useRef } from 'react'
 import { useMinimaxStore } from '../stores/useMinimaxStore'
+import { useChartState } from './state'
+import {
+  dedicatedRemoteChartUpdater,
+  generalBarcharUpdater,
+  registerChartComponents,
+  setupDedicatedRemoteChart,
+  setupGeneralBarchart,
+} from './chartFunctions'
 
-Chart.register(BarController, CategoryScale, LinearScale, BarElement, Tooltip)
+registerChartComponents()
 
 const ChartWidget = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const chartRef = useRef<Chart>(null)
+  const { onlyRemote } = useChartState()
 
   useEffect(() => {
-    if (canvasRef.current !== null && chartRef.current === null) {
-      chartRef.current = new Chart(canvasRef.current, {
-        type: 'bar',
-        data: {
-          labels: [],
-          datasets: [
-            {
-              data: [],
-            },
-          ],
-        },
-        options: {
-          responsive: true,
-          plugins: {
-            tooltip: {
-              enabled: true,
-              yAlign: 'bottom',
-            },
-          },
-        },
-      })
+    if (canvasRef.current === null) {
+      return
     }
-  }, [])
+    if (chartRef.current !== null) {
+      chartRef.current.destroy()
+      chartRef.current = null
+    }
+    chartRef.current = onlyRemote
+      ? setupDedicatedRemoteChart(canvasRef.current)
+      : setupGeneralBarchart(canvasRef.current)
+  }, [onlyRemote])
 
   const { results, clearResults } = useMinimaxStore()
   useEffect(() => {
-    if (chartRef.current) {
-      const maxValue = Math.max(...results)
-      const colors = results.map(value => {
-        const r = Math.round(255 * (value / maxValue))
-        const b = Math.round(255 * (1 - value / maxValue))
-        return `rgb(${r}, 0, ${b})`
-      })
-      const labels = Array.from(Array(results.length), (_, index) => index + 1)
-      chartRef.current.data.datasets[0].data = results
-      chartRef.current.data.datasets[0].backgroundColor = colors
-      chartRef.current.data.labels = labels
-
-      chartRef.current.update()
+    if (chartRef.current === null || onlyRemote) {
+      return
     }
-  }, [results])
+    generalBarcharUpdater(chartRef.current, results)
+  }, [results, onlyRemote])
+
+  const { remoteResults } = useMinimaxStore()
+  useEffect(() => {
+    if (chartRef.current === null || !onlyRemote) {
+      return
+    }
+    dedicatedRemoteChartUpdater(chartRef.current, remoteResults)
+  }, [remoteResults, onlyRemote])
 
   return (
     <div className="w-full h-full flex flex-col py-4 px-4 gap-4">

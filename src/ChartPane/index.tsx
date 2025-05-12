@@ -1,6 +1,5 @@
 import CheckboxControl from '../ControlPane/CheckboxControl'
 import ChartWidget from './ChartWidget'
-import RemoteChartWidget from './RemoteChartWidget'
 import { useChartState } from './state'
 
 const ChartPane = () => {
@@ -28,8 +27,7 @@ const ChartPane = () => {
         />
       </div>
 
-      {visible && !onlyRemote && <ChartWidget />}
-      {visible && onlyRemote && <RemoteChartWidget />}
+      {visible && <ChartWidget />}
     </div>
   )
 }
