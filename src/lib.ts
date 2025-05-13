@@ -17,7 +17,7 @@ export const cached = <A extends unknown[], R>(fn: (...args: A) => R) => {
 export const useThrottle = (
   action: () => void,
   delay: number,
-  dependencies: unknown[],
+  dependencies: unknown,
 ) => {
   useEffect(() => {
     const handle = setTimeout(() => {
@@ -26,14 +26,25 @@ export const useThrottle = (
     return () => {
       clearTimeout(handle)
     }
-  }, [action, delay, ...dependencies])
+  }, [action, delay, dependencies])
 }
 
-export const findBest = <T>(array: T[], evaluation: (item: T) => number) => {
+export const shuffled = <T>(array: T[]) => {
+  return array
+    .map(value => [value, Math.random()] as const)
+    .sort(([_, sortA], [__, sortB]) => sortA - sortB)
+    .map(([value, _]) => value)
+}
+
+export const findBest = <T>(
+  array: T[],
+  evaluation: (item: T) => number,
+  shuffle = false,
+) => {
   if (array.length <= 0) {
     return null
   }
-  return array
+  return (shuffle ? shuffled(array) : array)
     .map(item => [item, evaluation(item)] as const)
     .reduce((acc, elem) => {
       const [_, bestScore] = acc

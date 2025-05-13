@@ -5,7 +5,7 @@ import { useMinimaxStore } from '../stores/useMinimaxStore'
 
 const SimulationControls = () => {
   const { relaxedMoves, setRelaxation } = useGameState()
-  const { remote, setRemote } = useMinimaxStore()
+  const { remote, setRemote, unoptimized, setUnoptimized } = useMinimaxStore()
 
   return (
     <div className="flex flex-col p-4 items-center gap-4 border-b-4 border-[#eee]">
@@ -13,6 +13,11 @@ const SimulationControls = () => {
         title="Remote compute"
         value={remote}
         onChange={setRemote}
+      />
+      <CheckboxControl
+        title="Use unoptimized version"
+        value={unoptimized}
+        onChange={setUnoptimized}
       />
       <CheckboxControl
         title="Relax move constraint"
